@@ -5,17 +5,20 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.aura.bootcounter.uc.WorkUseCase
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 @HiltWorker
-class NotificationWork @Inject constructor(appContext: Context, workerParams: WorkerParameters):
-    CoroutineWorker(appContext, workerParams) {
-    @Inject
-    lateinit var workUseCase: WorkUseCase
+class NotificationWork @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val workUseCase: WorkUseCase
+) : CoroutineWorker(appContext, workerParams) {
+
     override suspend fun doWork(): Result {
         kotlin.runCatching {
             workUseCase.handle()
-        }
+        }.getOrThrow()
         return Result.success()
     }
 
